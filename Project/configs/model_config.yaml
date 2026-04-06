@@ -1,0 +1,82 @@
+# SO-SAFED TiDE-RIN Model Configuration
+# Time-series Dense Encoder with Reversible Instance Normalization
+#
+# These hyperparameters were used for the Phase 2 prospective deployment
+# (December 2024 -- May 2025) at the pediatric emergency department.
+
+model:
+  name: "TiDE-RIN"
+  architecture: "TiDEModel"
+
+  # Temporal windows
+  # input_chunk_length = 4 weeks of hourly data (7 * 24 * 4 * 2 = 1344)
+  # output_chunk_length = 4 weeks of hourly forecast (7 * 24 * 4 = 672)
+  input_chunk_length: 1344
+  output_chunk_length: 672
+
+  # Encoder-Decoder depth
+  num_encoder_layers: 16
+  num_decoder_layers: 16
+
+  # Layer widths
+  hidden_size: 1344
+  temporal_decoder_hidden: 16
+
+  # Regularization
+  dropout: 0.1
+  use_layer_norm: true
+  use_reversible_instance_norm: true
+
+training:
+  batch_size: 64
+  n_epochs: 16
+  random_state: 42
+
+  optimizer:
+    class: "torch.optim.Adam"
+    lr: 1.0e-4
+
+  lr_scheduler:
+    class: "torch.optim.lr_scheduler.ExponentialLR"
+    gamma: 0.999
+
+  early_stopping:
+    monitor: "train_loss"
+    patience: 10
+    min_delta: 1.0e-4
+    mode: "min"
+
+  accelerator: "gpu"
+
+covariates:
+  # Cyclic encoding of temporal features as future covariates
+  cyclic:
+    future: ["hour"]
+  datetime_attribute:
+    future: ["hour", "day", "week"]
+  position:
+    past: ["relative"]
+    future: ["relative"]
+
+prediction:
+  # Number of Monte Carlo samples for probabilistic forecasting
+  num_samples: 50
+  # Forecast horizon matches output_chunk_length
+  horizon_hours: 672
+
+shift_optimization:
+  # Integer Linear Programming constraints (PuLP)
+  shifts:
+    - name: "08-16"
+      start_hour: 8
+      end_hour: 16
+    - name: "16-24"
+      start_hour: 16
+      end_hour: 24
+    - name: "24-08"
+      start_hour: 0
+      end_hour: 8
+  min_physicians_per_shift: 2
+  max_physicians_per_shift: 8
+  baseline_physicians_per_shift: 4
+  target_patients_per_physician: 16

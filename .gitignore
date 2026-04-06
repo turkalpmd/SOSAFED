@@ -1,0 +1,86 @@
+# =============================================================================
+# SO-SAFED .gitignore
+# Ensures zero PHI (Protected Health Information) leakage
+# =============================================================================
+
+# Development phase (private artifacts, raw data, credentials)
+DevPhase/
+
+# Data files (potential PHI)
+*.csv
+*.xlsx
+*.xls
+*.tsv
+*.parquet
+*.feather
+*.arrow
+
+# Documents (may embed patient data)
+*.docx
+*.doc
+*.pdf
+
+# Model artifacts
+*.pkl
+*.pickle
+*.joblib
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.hdf5
+*.safetensors
+*.onnx
+*.pb
+*.npy
+*.npz
+*.keras
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.so
+.eggs/
+*.whl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment / secrets
+.env
+.env.*
+*.key
+*.pem
+credentials.*
+
+# Logs
+*.log
+logs/
+
+# TensorBoard
+lightning_logs/
+darts_logs/
+runs/
