@@ -17,7 +17,7 @@ This document describes the statistical methods used to evaluate the real-world 
 
 ## 0. Cohort and Negative-Boarding Cleaning
 
-A 31% subset of timestamp-complete after-hours visits (4,293 of 13,919) carried a **non-physical negative boarding time** (disposition timestamp earlier than examination-end timestamp), a timestamp-entry error that inflated boarding-derived effect estimates in earlier analyses. All boarding-derived results in Sections 1--3 below use the **cleaned cohort (n = 9,626; 4,711 intervention / 4,915 control)**. Demographic characteristics and diagnostic test-utilization rates (not boarding-derived) use the full timestamp-complete cohort (n = 13,935).
+A 31% subset of timestamped after-hours records (4,309 of 13,935) carried a **non-physical negative interval** (disposition timestamp earlier than examination-end timestamp, or missing entirely), a timestamp-entry error that inflated boarding-derived effect estimates in earlier analyses. All boarding-derived results in Sections 1--3 below use the **cleaned cohort (n = 9,626; 4,711 intervention / 4,915 control)**. Demographic characteristics and diagnostic test-utilization rates (not boarding-derived) use the full timestamp-complete cohort (n = 13,935).
 
 ## 1. Propensity Score Matching (PSM)
 

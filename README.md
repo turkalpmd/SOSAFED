@@ -10,7 +10,7 @@
 
 SO-SAFED is an AI-driven architecture that forecasts pediatric emergency department (PED) overcrowding and optimizes physician shift schedules using machine learning operations (MLOps). Trained on over 350,000 PED admissions and deployed prospectively at a university hospital, the system demonstrated significant reductions in Post-Evaluation Length of Stay (PE-LOS, formerly reported as "boarding time") through demand-responsive staffing.
 
-> **Code availability.** The code state corresponding to the "Prospective Optimization of After-Hours Pediatric Emergency Department Staffing Using Machine-Learning Forecasts" manuscript (Phase 2) is archived at tag [`v1.0.0`](https://github.com/turkalpmd/SOSAFED/releases/tag/v1.0.0).
+> **Code availability.** The code state corresponding to the "Forecast-Driven Dynamic Physician Staffing in a Pediatric Emergency Department: A Prospective Quasi-Experimental Pilot Study" manuscript (Phase 2) is archived at tag [`v1.0.0`](https://github.com/turkalpmd/SOSAFED/releases/tag/v1.0.0).
 
 ---
 
@@ -206,7 +206,7 @@ Secondary/exploratory outcomes include Hospital LOS, Exam LOS, diagnostic test u
 
 ### Cohort and Data-Quality Note
 
-After-hours visits were reconciled to a single canonical analytic cohort. A 31% subset (4,293 of 13,919 timestamp-complete visits) had a **non-physical negative boarding time** (disposition timestamp earlier than examination-end timestamp -- a timestamp-entry error, not a true value), which inflated earlier boarding-time effect estimates. All boarding-derived results below use the **cleaned cohort**; demographic and test-utilization rows unaffected by the boarding timestamp use the full cohort.
+After-hours visits were reconciled to a single canonical analytic cohort. A 31% subset (4,309 of 13,935 timestamped after-hours records) had a **non-physical negative interval** (disposition timestamp earlier than examination-end timestamp, or missing entirely -- a timestamp-entry error, not a true value), which inflated earlier boarding-time effect estimates. All boarding-derived results below use the **cleaned cohort**; demographic and test-utilization rows unaffected by the boarding timestamp use the full cohort.
 
 | Step | Filter | N (visits) |
 |------|--------|------------|
@@ -284,7 +284,7 @@ In-ED mortality and documented adverse events could not be ascertained from the 
 | PSM, parsimonious (sensitivity) | -18.4 / -21.1 min | < 0.001 |
 | ITS, immediate level change (sensitivity) | -24.2 min | 0.011 |
 
-All methods converge on the same conclusion: AI-optimized staffing **causally reduces** ED boarding time, with the fully adjusted patient-level estimate (~8--10 minutes) as the most conservative and best-controlled figure, corroborated by parsimonious PSM and ITS as sensitivity analyses.
+All methods converge on the same direction of effect: AI-optimized staffing **was associated with a reduction in** PE-LOS, with the fully adjusted patient-level estimate (approximately 8 to 10 minutes) as the most conservative and best-controlled figure, corroborated by parsimonious PSM and ITS as sensitivity analyses.
 
 ### Return on Investment
 
@@ -377,6 +377,18 @@ See [`notebooks/03_prediction.ipynb`](notebooks/03_prediction.ipynb). Generates 
 ### 4. Boarding Time Analysis
 
 See [`notebooks/04_boarding_analysis.ipynb`](notebooks/04_boarding_analysis.ipynb). Runs the full causal evaluation suite (PSM, ITS, HTE, Spillover).
+
+### 5. Reproducing the Manuscript Tables and Figures
+
+| Manuscript item | Notebook |
+|---|---|
+| Table 1 (baseline characteristics) | `notebooks/01_data_preparation.ipynb` |
+| Table 2, Figure 1 (forecasting performance) | `notebooks/02_model_training.ipynb` |
+| Table 3, Figure 2 (deployment and staffing) | `notebooks/03_prediction.ipynb` |
+| Tables 4--6, Figure 4 (PSM, ITS, subgroup effects) | `notebooks/04_boarding_analysis.ipynb` |
+| Tables 7--8, Figure 3 (test utilisation, workload) | `notebooks/04_boarding_analysis.ipynb` |
+
+All results are computed on the cleaned cohort (n = 9,626) unless the notebook states otherwise.
 
 ---
 
