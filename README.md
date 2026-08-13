@@ -194,60 +194,87 @@ Using integer linear programming (PuLP library):
 - Analysis window: 16:00--24:00 shift (peak demand)
 - 100% intervention fidelity (schedules delivered 5 days in advance)
 
+### Cohort and Data-Quality Note
+
+After-hours visits were reconciled to a single canonical analytic cohort. A 31% subset (4,293 of 13,919 timestamp-complete visits) had a **non-physical negative boarding time** (disposition timestamp earlier than examination-end timestamp -- a timestamp-entry error, not a true value), which inflated earlier boarding-time effect estimates. All boarding-derived results below use the **cleaned cohort**; demographic and test-utilization rows unaffected by the boarding timestamp use the full cohort.
+
+| Step | Filter | N (visits) |
+|------|--------|------------|
+| Full after-hours registry | Triage entry 16:00--23:59, Dec 2024--May 2025 | 15,380 |
+| Timestamp-complete (FULL) | Analytic exam/disposition timestamps present | 13,935 (6,957 intervention / 6,978 control) |
+| **Cleaned boarding cohort (CLEAN)** | Negative-boarding records (31%) excluded | **9,626 (4,711 intervention / 4,915 control)** |
+
 ### Causal Evaluation Results
 
 #### Propensity Score Matching (PSM)
 
-PSM controls for selection bias by matching intervention and control patients on observed confounders (arrival hour, day of week, month, triage acuity).
+PSM controls for selection bias by matching intervention and control patients on observed confounders. Two specifications are reported: a **fully adjusted** model requested during peer review (age, sex, daily volume, full 5-level CTAS) and a **parsimonious** model (arrival hour, day of week, month, binary triage) as a convergent sensitivity check.
 
-| Metric | Value |
-|--------|-------|
-| Matched pairs | 6,949 |
-| **ATT (Average Treatment Effect on Treated)** | **-31.9 minutes** |
-| P-value | **< 0.0001** |
-| Boarding time (AI-optimized) | 117.4 min |
-| Boarding time (Control) | 149.3 min |
-| Effect size | 21.4% reduction |
+| Metric | Fully Adjusted PSM (primary) | Parsimonious PSM (sensitivity) |
+|--------|-------------------------------|----------------------------------|
+| Matched pairs | 4,708 (caliper 0.2 SD) | 4,711 |
+| **ATT, mean** | **-7.9 minutes** | -18.4 minutes |
+| **ATT, median** | **-10.0 minutes** | -21.1 minutes |
+| P-value | **0.003** | < 0.001 |
+| Stabilized IPTW (corroboration) | -8.5 minutes (worst weighted SMD 0.01) | -- |
+| E-value | 1.28 (mean) / 1.32 (median) | 1.48 / 1.53 |
 
-All post-matching SMD < 0.1 (excellent covariate balance).
+All covariates balanced post-matching (|SMD| < 0.10) except daily volume (-0.111, resolved by stabilized IPTW weighting). The fully adjusted estimate is the recommended primary confounding-adjusted effect; the earlier headline figure of **-31.9 minutes was an artefact of the 31% negative-boarding timestamp errors** and has been retired.
 
 #### Interrupted Time Series (ITS)
 
-Segmented regression to assess temporal causality:
+Segmented regression to assess temporal causality (cleaned cohort):
 
 | Parameter | Coefficient | P-value | Interpretation |
 |-----------|-------------|---------|----------------|
-| Baseline trend | -0.073 | 0.203 (NS) | Pre-intervention boarding was stable |
-| **Immediate effect** | **-22.1 min** | **0.010** | AI caused an instant step-down |
-| Trend change | +0.136 | 0.098 | Slight attenuation (marginally significant) |
+| Baseline trend | -0.14 | 0.025 | Pre-intervention boarding had a slight downward trend |
+| **Immediate effect** | **-24.2 min** | **0.011** | AI caused an instant step-down |
+| Trend change | +0.19 | 0.039 | Attenuation over time |
 
-Stable baseline confirms the reduction is a **new causal effect**, not a continuation of a pre-existing trend.
+The immediate step-down is robust to the negative-boarding cleaning (-22.1 min uncleaned to -24.2 min cleaned) because ITS aggregates to hourly means, which partially average out the timestamp-error records.
 
 #### Heterogeneous Treatment Effects
 
 | Subgroup | Effect | P-value | Significant |
 |----------|--------|---------|-------------|
-| **Low Risk (T4--T5)** | **-11.6 min** | **< 0.0001** | Yes |
-| High Risk (T1--T3) | -3.0 min | 0.693 | No |
-| **Peak hours (16--19)** | **-16.0 min** | **0.0001** | Yes |
-| Late hours (20--24) | -6.3 min | 0.012 | Yes |
+| **Low Risk (T4--T5)** | **-9.2 min** | **0.010** | Yes |
+| High Risk (T1--T3) | -2.5 min | 0.73 | No |
+| **Peak hours (16--19)** | **-14.7 min** | **0.004** | Yes |
+| Late hours (20--24) | -3.1 min | 0.41 | No |
 
-Low-risk patients benefit most because they are most sensitive to capacity expansion. High-risk patients are already fast-tracked by triage protocols regardless of staffing levels.
+Low-risk patients benefit most because they are most sensitive to capacity expansion. High-risk patients are already fast-tracked by triage protocols regardless of staffing levels. The late-hours (20:00--24:00) subgroup, significant in the uncleaned analysis, does **not** survive the negative-boarding cleaning; direction is preserved but the finding is now reported as non-significant and likely underpowered.
 
 #### Spillover Analysis
 
-- Spearman r = -0.049, p = 0.185
-- **No contamination:** The control period remained stable, confirming a clean comparison.
+| Aggregation | n | Spearman r | P-value |
+|-------------|---|------------|---------|
+| Hourly (original) | 734 | -0.049 | 0.185 |
+| **Daily, canonical cohort (recommended)** | **92** | **-0.097** | **0.36** |
+
+**No contamination:** The control period remained stable. The daily test was powered (80%, two-sided alpha = 0.05) to detect a monotonic drift of |r| >= 0.29 (~0.56 min/day, ~52 min over the 92-day window); the observed trend is far below this threshold.
+
+#### Patient-Safety Screen
+
+A descriptive safety screen on the full after-hours index-visit registry (N = 15,380) found no signal that operational gains came at the expense of short-term safety:
+
+| Endpoint | Intervention | Control | P-value |
+|----------|---------------|---------|---------|
+| 72-hour ED return | 9.92% | 10.02% | 0.86 |
+| 7-day ED return | 14.33% | 14.33% | 1.00 |
+| Discharge against advice / unauthorized exit | 0.039% | 0.104% | 0.23 |
+
+In-ED mortality and documented adverse events could not be ascertained from the operational extract and will be captured prospectively in a planned multi-center extension.
 
 #### Convergent Validity
 
 | Method | Effect Size | P-value |
 |--------|------------|---------|
-| Basic Mann-Whitney | -9.7 min | 0.035 |
-| PSM (patient-level) | -31.9 min | < 0.0001 |
-| ITS (temporal) | -22.1 min | 0.010 |
+| Unadjusted (clean cohort, Mann-Whitney) | -8.2 min | 0.012 |
+| **PSM, fully adjusted (primary)** | **-7.9 / -10.0 min** | **0.003** |
+| PSM, parsimonious (sensitivity) | -18.4 / -21.1 min | < 0.001 |
+| ITS, immediate level change (sensitivity) | -24.2 min | 0.011 |
 
-All methods converge on the same conclusion: AI-optimized staffing **causally reduces** ED boarding time.
+All methods converge on the same conclusion: AI-optimized staffing **causally reduces** ED boarding time, with the fully adjusted patient-level estimate (~8--10 minutes) as the most conservative and best-controlled figure, corroborated by parsimonious PSM and ITS as sensitivity analyses.
 
 ### Return on Investment
 
@@ -255,6 +282,8 @@ All methods converge on the same conclusion: AI-optimized staffing **causally re
 |----------|-------------|------------|
 | Conservative (20% physician time saved) | 14.8% | 29.6% |
 | Realistic (30% physician time saved) | 32.9% | 65.8% |
+
+*ROI figures derive from the physician-workload analysis and were not recomputed as part of the negative-boarding cohort cleaning.*
 
 ---
 
