@@ -4,10 +4,13 @@
 
 [![DOI](https://img.shields.io/badge/DOI-10.1093%2Fjamiaopen%2Fooae138-blue)](https://doi.org/10.1093/jamiaopen/ooae138)
 [![Journal](https://img.shields.io/badge/JAMIA%20Open-2025-green)](https://academic.oup.com/jamiaopen/article/8/2/ooae138/8090057)
+[![Version](https://img.shields.io/badge/version-v1.0.0-blueviolet.svg)](https://github.com/turkalpmd/SOSAFED/releases/tag/v1.0.0)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
 
-SO-SAFED is an AI-driven architecture that forecasts pediatric emergency department (PED) overcrowding and optimizes physician shift schedules using machine learning operations (MLOps). Trained on over 350,000 PED admissions and deployed prospectively at a university hospital, the system demonstrated significant reductions in patient boarding time through demand-responsive staffing.
+SO-SAFED is an AI-driven architecture that forecasts pediatric emergency department (PED) overcrowding and optimizes physician shift schedules using machine learning operations (MLOps). Trained on over 350,000 PED admissions and deployed prospectively at a university hospital, the system demonstrated significant reductions in Post-Evaluation Length of Stay (PE-LOS, formerly reported as "boarding time") through demand-responsive staffing.
+
+> **Code availability.** The code state corresponding to the "Prospective Optimization of After-Hours Pediatric Emergency Department Staffing Using Machine-Learning Forecasts" manuscript (Phase 2) is archived at tag [`v1.0.0`](https://github.com/turkalpmd/SOSAFED/releases/tag/v1.0.0).
 
 ---
 
@@ -193,6 +196,13 @@ Using integer linear programming (PuLP library):
 - Days 16--31: Fixed 4-physician staffing (control)
 - Analysis window: 16:00--24:00 shift (peak demand)
 - 100% intervention fidelity (schedules delivered 5 days in advance)
+- **IRB approval:** Hacettepe University Non-Interventional Clinical Research Ethics Committee, Approval No. SBA 24/1092 (distinct from the Phase 1 retrospective-simulation approval, GO 23/508)
+
+### Outcome Measures
+
+**Primary outcome: Post-Evaluation Length of Stay (PE-LOS), in minutes.** Operationally defined as the interval from completion of the physician's initial evaluation to departure from the PED (Hospital LOS minus Exam LOS), encompassing post-evaluation delays related to disposition, diagnostic workup, consultation, and administrative discharge. PE-LOS was selected as the primary outcome because prior work identified the post-examination disposition process, not the time to initial physician evaluation, as the principal operational bottleneck in this PED; PE-LOS therefore isolates the component of ED length of stay most directly modifiable by physician staffing. **This metric was previously reported as "boarding time"**; the two terms refer to the same measurement and are used interchangeably below.
+
+Secondary/exploratory outcomes include Hospital LOS, Exam LOS, diagnostic test utilization, hourly census, cumulative presence/demand burden, physician workload, and the patient-safety screen (72-hour/7-day ED return, against-advice discharge).
 
 ### Cohort and Data-Quality Note
 
@@ -402,7 +412,9 @@ The TiDE model implementation is adapted from the [Darts library](https://github
 ## Acknowledgements
 
 - **Hacettepe University** Faculty of Medicine, Division of Pediatric Emergency Medicine
-- **Institutional Review Board** approval: GO 23/508
+- **Institutional Review Board approvals:**
+  - Phase 1 (retrospective MLOps simulation, JAMIA Open 2025): GO 23/508
+  - Phase 2 (prospective deployment): SBA 24/1092
 - **Darts library** (Unit8) for the time-series forecasting framework
 - **PuLP** for integer linear programming optimization
 

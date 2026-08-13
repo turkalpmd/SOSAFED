@@ -9,6 +9,11 @@ This document describes the statistical methods used to evaluate the real-world 
 - **Control period** (days 16--31): Fixed 4-physician staffing (historical standard).
 - **Analysis window:** 16:00--24:00 shift (peak demand period).
 - **Duration:** 6 months (December 2024 -- May 2025), yielding 1,456 analysis hours.
+- **IRB approval:** Hacettepe University Non-Interventional Clinical Research Ethics Committee, Approval No. SBA 24/1092 (Phase 2; distinct from the Phase 1 retrospective-simulation approval GO 23/508).
+
+## Outcome Measures
+
+**Primary outcome: Post-Evaluation Length of Stay (PE-LOS), in minutes** -- the interval from completion of the physician's initial evaluation to departure from the PED (Hospital LOS minus Exam LOS). PE-LOS isolates the component of ED length of stay most directly modifiable by physician staffing, since prior work identified the post-examination disposition process (not time to initial evaluation) as the principal bottleneck in this PED. **PE-LOS was previously reported as "boarding time"**; both terms denote the same measurement and are used interchangeably throughout this document.
 
 ## 0. Cohort and Negative-Boarding Cleaning
 
